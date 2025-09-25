@@ -1,6 +1,12 @@
 # API Keys and sensitive data
 config.json
 
+# Generated files
+generated-schedule.json
+
+# TypeScript build output
+dist/
+
 # Node.js dependencies
 node_modules/
 

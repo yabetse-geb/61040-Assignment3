@@ -1,18 +1,19 @@
-# Gemini Schedule Demo 🎓
+# Gemini Schedule Demo. Built using Cursor.
 
-A simple Node.js application that demonstrates how to use Google's Gemini API to create intelligent daily schedules for students. This demo shows how AI can help organize tasks and events into optimal time slots based on student preferences.
+A TypeScript application that demonstrates how to use Google's Gemini API to create intelligent daily schedules for students. This demo shows how AI can help organize tasks and events into optimal time slots based on student preferences.
 
 ## What This Demo Does
 
 This application:
 1. **Loads student data** from a JSON file containing tasks, events, and preferences
-2. **Sends the data to Gemini Flash 2.5** with instructions to create an optimal schedule
+2. **Sends the data to Gemini Flash 2.5 Lite** with instructions to create an optimal schedule
 3. **Receives a structured schedule** organized into morning, afternoon, and evening time slots
 4. **Displays the results** in a user-friendly format and saves them to a file
 
 ## Prerequisites
 
 - **Node.js** (version 14 or higher)
+- **TypeScript** (will be installed automatically)
 - **Google Gemini API Key** (free to get at [Google AI Studio](https://makersuite.google.com/app/apikey))
 
 ## Quick Setup
@@ -47,29 +48,44 @@ cp config.json.template config.json
 
 ### 3. Run the Application
 
-You can run the application in two ways:
+You can run the application in several ways:
 
 **Option 1: Using npm (recommended)**
 ```bash
 npm start
 ```
+This will compile TypeScript and run the application.
 
-**Option 2: Running the file directly**
+**Option 2: Development mode (with ts-node)**
 ```bash
-node schedule.js
+npm run dev
+```
+This runs TypeScript directly without compilation. Note: Due to module resolution complexities with ts-node, the compiled version (Option 1) is recommended for reliability.
+
+**Option 3: Manual compilation**
+```bash
+npm run build
+node dist/schedule.js
 ```
 
-Both commands do the same thing! The application will load the sample student data and generate a schedule using Gemini AI.
+All methods do the same thing! The application will load the sample student data and generate a schedule using Gemini AI.
 
 ## File Structure
 
 ```
 gemini-schedule-demo/
-├── package.json          # Node.js dependencies
+├── package.json          # Node.js dependencies and TypeScript config
+├── tsconfig.json         # TypeScript configuration
 ├── config.json.template  # Template for API key configuration
 ├── config.json           # Your Gemini API key (create this from template)
 ├── student-data.json     # Sample student data with tasks and preferences
-├── schedule.js           # Main application file
+├── schedule.ts           # Main application entry point
+├── types.ts              # TypeScript interfaces and type definitions
+├── config-loader.ts      # Configuration loading utilities
+├── data-loader.ts        # Student data loading and display functions
+├── gemini-client.ts      # Gemini AI API interactions
+├── schedule-display.ts   # Schedule parsing and output formatting
+├── dist/                 # Compiled JavaScript output (auto-generated)
 ├── .gitignore           # Git ignore file (protects your API key)
 └── README.md            # This file
 ```
@@ -77,23 +93,36 @@ gemini-schedule-demo/
 ## Understanding the Code
 
 ### `student-data.json`
-Contains sample data for a student named Alex Johnson, including:
+Contains sample data for a student named Daniel Jackson, including:
 - **Student preferences**: How they like to organize their day
 - **Events list**: Tasks, classes, meals, and activities with categories and durations
 
-### `schedule.js`
-The main application that:
-- Loads student data from the JSON file
-- Creates a detailed prompt for Gemini AI
-- Calls the Gemini API to generate a schedule
-- Parses and displays the results
+### Modular Architecture
+
+The application is organized into focused modules:
+
+**`schedule.ts`** - Main entry point that orchestrates the entire process
+**`types.ts`** - TypeScript interfaces for all data structures
+**`config-loader.ts`** - Handles API key loading and configuration management
+**`data-loader.ts`** - Loads student data and displays input information
+**`gemini-client.ts`** - Manages all Gemini AI API interactions
+**`schedule-display.ts`** - Parses and formats the schedule output
+
+This modular approach makes the code:
+- **Easier to understand**: Each file has a single responsibility
+- **Easier to test**: Individual modules can be tested in isolation
+- **Easier to maintain**: Changes to one feature don't affect others
+- **More reusable**: Modules can be imported and used elsewhere
 
 ### Key Features for Students
 
+- **Modular architecture**: Clean separation of concerns with focused modules
+- **TypeScript types**: Full type safety with interfaces for all data structures
 - **Clear comments**: Every section is explained for learning
 - **Error handling**: Shows helpful messages if something goes wrong
 - **Structured output**: Results are organized and easy to read
 - **File saving**: Generated schedules are saved for reference
+- **Development tools**: Multiple ways to run the application (compiled or direct)
 
 ## Sample Output
 
@@ -147,10 +176,7 @@ To use your own student data:
    ```bash
    npm start
    ```
-   or
-   ```bash
-   node schedule.js
-   ```
+   (Recommended: Use the compiled version for best reliability)
 
 ## Troubleshooting
 
@@ -167,6 +193,22 @@ To use your own student data:
 - This sometimes happens if Gemini returns extra text
 - The raw response will be displayed so you can see what went wrong
 
+### "loadApiKey is not a function" or similar module errors
+- This happens with ts-node in development mode due to module resolution issues
+- Use `npm start` (compiled version) instead of `npm run dev`
+- The compiled version works perfectly and is recommended
+
+
+## Learning Objectives
+
+This demo teaches:
+- **Modular Programming**: How to organize code into focused, reusable modules
+- **TypeScript Development**: Type safety, interfaces, and modern JavaScript features
+- **API Integration**: How to connect to external AI services
+- **JSON Processing**: Reading and writing structured data with type checking
+- **Error Handling**: Graceful failure management with proper typing
+- **Prompt Engineering**: How to ask AI for specific output formats
+- **Node.js Basics**: File system operations, async programming
 
 ## Next Steps
 
@@ -180,6 +222,7 @@ Try modifying the code to:
 ## Resources
 
 - [Google Generative AI Documentation](https://ai.google.dev/docs)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [Node.js File System Module](https://nodejs.org/api/fs.html)
 - [JSON Format Guide](https://www.json.org/json-en.html)
 
