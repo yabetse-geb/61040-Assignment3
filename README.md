@@ -138,11 +138,6 @@ To use your own student data:
    - Update the preferences paragraph
    - Modify the events list with your own tasks
 
-2. **Run the application**:
-   ```bash
-   npm start
-   ```
-   (Recommended: Use the compiled version for best reliability)
 
 ## Troubleshooting
 
@@ -164,18 +159,6 @@ To use your own student data:
 - Use `npm start` (compiled version) instead of `npm run dev`
 - The compiled version works perfectly and is recommended
 
-
-## Learning Objectives
-
-This demo teaches:
-- **Modular Programming**: How to organize code into focused, reusable modules
-- **TypeScript Development**: Type safety, interfaces, and modern JavaScript features
-- **API Integration**: How to connect to external AI services
-- **JSON Processing**: Reading and writing structured data with type checking
-- **Error Handling**: Graceful failure management with proper typing
-- **Prompt Engineering**: How to ask AI for specific output formats
-- **Node.js Basics**: File system operations, async programming
-
 ## Next Steps
 
 Try modifying the code to:
@@ -191,7 +174,3 @@ Try modifying the code to:
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [Node.js File System Module](https://nodejs.org/api/fs.html)
 - [JSON Format Guide](https://www.json.org/json-en.html)
-
----
-
-**Happy coding!** 🚀 This demo shows how powerful AI can be for solving everyday problems like schedule optimization.
