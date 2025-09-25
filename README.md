@@ -90,40 +90,6 @@ gemini-schedule-demo/
 └── README.md            # This file
 ```
 
-## Understanding the Code
-
-### `student-data.json`
-Contains sample data for a student named Daniel Jackson, including:
-- **Student preferences**: How they like to organize their day
-- **Events list**: Tasks, classes, meals, and activities with categories and durations
-
-### Modular Architecture
-
-The application is organized into focused modules:
-
-**`schedule.ts`** - Main entry point that orchestrates the entire process
-**`types.ts`** - TypeScript interfaces for all data structures
-**`config-loader.ts`** - Handles API key loading and configuration management
-**`data-loader.ts`** - Loads student data and displays input information
-**`gemini-client.ts`** - Manages all Gemini AI API interactions
-**`schedule-display.ts`** - Parses and formats the schedule output
-
-This modular approach makes the code:
-- **Easier to understand**: Each file has a single responsibility
-- **Easier to test**: Individual modules can be tested in isolation
-- **Easier to maintain**: Changes to one feature don't affect others
-- **More reusable**: Modules can be imported and used elsewhere
-
-### Key Features for Students
-
-- **Modular architecture**: Clean separation of concerns with focused modules
-- **TypeScript types**: Full type safety with interfaces for all data structures
-- **Clear comments**: Every section is explained for learning
-- **Error handling**: Shows helpful messages if something goes wrong
-- **Structured output**: Results are organized and easy to read
-- **File saving**: Generated schedules are saved for reference
-- **Development tools**: Multiple ways to run the application (compiled or direct)
-
 ## Sample Output
 
 The application will generate a schedule like this:
