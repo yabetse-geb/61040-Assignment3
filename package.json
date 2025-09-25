@@ -1,0 +1,16 @@
+{
+  "name": "gemini-schedule-demo",
+  "version": "1.0.0",
+  "description": "A demo application showing how to use Google's Gemini API to create student schedules",
+  "main": "schedule.js",
+  "scripts": {
+    "start": "node schedule.js",
+    "test": "node schedule.js"
+  },
+  "keywords": ["gemini", "ai", "schedule", "student", "demo"],
+  "author": "Student Demo",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0"
+  }
+}
