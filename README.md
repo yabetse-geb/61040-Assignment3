@@ -167,14 +167,6 @@ To use your own student data:
 - This sometimes happens if Gemini returns extra text
 - The raw response will be displayed so you can see what went wrong
 
-## Learning Objectives
-
-This demo teaches:
-- **API Integration**: How to connect to external AI services
-- **JSON Processing**: Reading and writing structured data
-- **Error Handling**: Graceful failure management
-- **Prompt Engineering**: How to ask AI for specific output formats
-- **Node.js Basics**: File system operations, async programming
 
 ## Next Steps
 

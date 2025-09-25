@@ -101,7 +101,7 @@ Return your response as a JSON object with this exact structure:
   ]
 }
 
-Make sure to include ALL the provided events in your schedule.`;
+Make sure to include ALL the provided events in your schedule. Do NOT make up any events that are not provided in the student data.`;
 }
 
 /**
