@@ -1,0 +1,86 @@
+{
+  "morning": [
+    {
+      "time": "7:00 AM",
+      "activity": "Morning Run",
+      "category": "exercise",
+      "duration": "30 minutes"
+    },
+    {
+      "time": "7:30 AM",
+      "activity": "Get Ready/Transition",
+      "category": "transition",
+      "duration": "30 minutes"
+    },
+    {
+      "time": "8:00 AM",
+      "activity": "Breakfast",
+      "category": "meal",
+      "duration": "20 minutes"
+    },
+    {
+      "time": "8:20 AM",
+      "activity": "Workout at Gym",
+      "category": "exercise",
+      "duration": "60 minutes"
+    },
+    {
+      "time": "9:20 AM",
+      "activity": "Grocery Shopping",
+      "category": "errand",
+      "duration": "45 minutes"
+    },
+    {
+      "time": "10:05 AM",
+      "activity": "Free Time/Prepare for Study",
+      "category": "transition",
+      "duration": "1 hour 55 minutes"
+    }
+  ],
+  "afternoon": [
+    {
+      "time": "12:00 PM",
+      "activity": "Lunch",
+      "category": "meal",
+      "duration": "30 minutes"
+    },
+    {
+      "time": "12:30 PM",
+      "activity": "Study for Math Exam",
+      "category": "study",
+      "duration": "2 hours"
+    },
+    {
+      "time": "2:30 PM",
+      "activity": "CS 6104 Lecture",
+      "category": "class",
+      "duration": "75 minutes"
+    },
+    {
+      "time": "3:45 PM",
+      "activity": "Group Project Meeting",
+      "category": "study",
+      "duration": "90 minutes"
+    },
+    {
+      "time": "5:15 PM",
+      "activity": "Read Assigned Chapters",
+      "category": "study",
+      "duration": "1 hour"
+    }
+  ],
+  "evening": [
+    {
+      "time": "6:00 PM",
+      "activity": "Dinner with Jane and Joe",
+      "category": "social",
+      "duration": "90 minutes"
+    },
+    {
+      "time": "7:30 PM",
+      "activity": "Wind down/Free Time",
+      "category": "leisure",
+      "duration": "3 hours 30 minutes"
+    }
+  ]
+}

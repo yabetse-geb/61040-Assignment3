@@ -1,9 +1,6 @@
 # API Keys and sensitive data
 config.json
 
-# Generated files
-generated-schedule.json
-
 # Node.js dependencies
 node_modules/
 
