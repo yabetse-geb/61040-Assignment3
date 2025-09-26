@@ -18,6 +18,9 @@ This application:
 
 ## Quick Setup
 
+### 0. Clone the repo locally and navigate to it
+```cd intro-gemini-schedule```
+
 ### 1. Install Dependencies
 
 ```bash
