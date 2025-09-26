@@ -1,4 +1,4 @@
-# Gemini Schedule Demo. Built using Cursor.
+# Gemini Schedule Demo
 
 A TypeScript application that demonstrates how to use Google's Gemini API to create intelligent daily schedules for students. This demo shows how AI can help organize tasks and events into optimal time slots based on student preferences.
 
@@ -175,5 +175,7 @@ Try modifying the code to:
 
 - [Google Generative AI Documentation](https://ai.google.dev/docs)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-- [Node.js File System Module](https://nodejs.org/api/fs.html)
-- [JSON Format Guide](https://www.json.org/json-en.html)
+
+## How this was built
+
+I built this demo using Cursor's agent mode. It required quite a bit of iteration, as well as many manual changes on my part.
