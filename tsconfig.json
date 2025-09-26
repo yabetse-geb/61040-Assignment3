@@ -20,12 +20,10 @@
     "*.ts"
   ],
   "files": [
-    "schedule.ts",
-    "types.ts", 
-    "config-loader.ts",
-    "data-loader.ts",
-    "gemini-client.ts",
-    "schedule-display.ts"
+    "dayplanner-types.ts",
+    "dayplanner.ts",
+    "dayplanner-llm.ts",
+    "dayplanner-tests.ts"
   ],
   "exclude": [
     "node_modules",
