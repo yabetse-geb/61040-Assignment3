@@ -1,5 +1,4 @@
-# DayPlanner - First Principles Implementation
-
+# DayPlanner 
 A clean, simple day planner built from first principles using TypeScript and Google's Gemini AI. This implementation focuses on the core concept of organizing activities for a single day with both manual and AI-assisted scheduling.
 
 ## Concept: DayPlanner
@@ -26,6 +25,9 @@ A clean, simple day planner built from first principles using TypeScript and Goo
 - **Google Gemini API Key** (free at [Google AI Studio](https://makersuite.google.com/app/apikey))
 
 ## Quick Setup
+
+### 0. Clone the repo locally and navigate to it
+```cd intro-gemini-schedule```
 
 ### 1. Install Dependencies
 
@@ -178,4 +180,3 @@ Try extending the DayPlanner:
 
 - [Google Generative AI Documentation](https://ai.google.dev/docs)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-- [Node.js Documentation](https://nodejs.org/docs/)
