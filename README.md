@@ -1,20 +1,28 @@
-# Gemini Schedule Demo
+# DayPlanner 
+A clean, simple day planner built from first principles using TypeScript and Google's Gemini AI. This implementation focuses on the core concept of organizing activities for a single day with both manual and AI-assisted scheduling.
 
-A TypeScript application that demonstrates how to use Google's Gemini API to create intelligent daily schedules for students. This demo shows how AI can help organize tasks and events into optimal time slots based on student preferences.
+## Concept: DayPlanner
 
-## What This Demo Does
+**Purpose**: Help you organize activities for a single day  
+**Principle**: You can add activities one at a time, assign them to times, and then observe the completed schedule
 
-This application:
-1. **Loads student data** from a JSON file containing tasks, events, and preferences
-2. **Sends the data to Gemini Flash 2.5 Lite** with instructions to create an optimal schedule
-3. **Receives a structured schedule** organized into morning, afternoon, and evening time slots
-4. **Displays the results** in a user-friendly format and saves them to a file
+### Core State
+- **Activities**: Set of activities with title, duration, and optional startTime
+- **Assignments**: Set of activity-to-time assignments
+- **Time System**: All times in half-hour slots starting at midnight (0 = 12:00 AM, 13 = 6:30 AM)
+
+### Core Actions
+- `addActivity(title: string, duration: number): Activity`
+- `removeActivity(activity: Activity)`
+- `assignActivity(activity: Activity, startTime: number)`
+- `unassignActivity(activity: Activity)`
+- `requestAssignmentsFromLLM()` - AI-assisted scheduling with hardwired preferences
 
 ## Prerequisites
 
 - **Node.js** (version 14 or higher)
 - **TypeScript** (will be installed automatically)
-- **Google Gemini API Key** (free to get at [Google AI Studio](https://makersuite.google.com/app/apikey))
+- **Google Gemini API Key** (free at [Google AI Studio](https://makersuite.google.com/app/apikey))
 
 ## Quick Setup
 
@@ -29,7 +37,10 @@ npm install
 
 ### 2. Add Your API Key
 
-**Important:** The `config.json` file is not included in this repository for security reasons. You need to create it yourself.
+**Why use a template?** The `config.json` file contains your private API key and should never be committed to version control. The template approach lets you:
+- Keep the template file in git (safe to share)
+- Create your own `config.json` locally (keeps your API key private)
+- Easily set up the project on any machine
 
 **Step 1:** Copy the template file:
 ```bash
@@ -47,135 +58,125 @@ cp config.json.template config.json
 1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
 2. Sign in with your Google account
 3. Click "Create API Key"
-4. Copy the key and paste it into `config.json`
+4. Copy the key and paste it into `config.json` (replacing `YOUR_GEMINI_API_KEY_HERE`)
 
 ### 3. Run the Application
 
-You can run the application in several ways:
-
-**Option 1: Using npm (recommended)**
+**Run all test cases:**
 ```bash
 npm start
 ```
-This will compile TypeScript and run the application.
 
-**Option 2: Development mode (with ts-node)**
+**Run specific test cases:**
 ```bash
-npm run dev
+npm run manual    # Manual scheduling only
+npm run llm       # LLM-assisted scheduling only
+npm run mixed     # Mixed manual + LLM scheduling
 ```
-This runs TypeScript directly without compilation. Note: Due to module resolution complexities with ts-node, the compiled version (Option 1) is recommended for reliability.
-
-**Option 3: Manual compilation**
-```bash
-npm run build
-node dist/schedule.js
-```
-
-All methods do the same thing! The application will load the sample student data and generate a schedule using Gemini AI.
 
 ## File Structure
 
 ```
-gemini-schedule-demo/
-├── package.json          # Node.js dependencies and TypeScript config
-├── tsconfig.json         # TypeScript configuration
-├── config.json.template  # Template for API key configuration
-├── config.json           # Your Gemini API key (create this from template)
-├── student-data.json     # Sample student data with tasks and preferences
-├── schedule.ts           # Main application entry point
-├── types.ts              # TypeScript interfaces and type definitions
-├── config-loader.ts      # Configuration loading utilities
-├── data-loader.ts        # Student data loading and display functions
-├── gemini-client.ts      # Gemini AI API interactions
-├── schedule-display.ts   # Schedule parsing and output formatting
-├── dist/                 # Compiled JavaScript output (auto-generated)
-├── .gitignore           # Git ignore file (protects your API key)
-└── README.md            # This file
+dayplanner/
+├── package.json              # Dependencies and scripts
+├── tsconfig.json             # TypeScript configuration
+├── config.json               # Your Gemini API key
+├── dayplanner-types.ts       # Core type definitions
+├── dayplanner.ts             # DayPlanner class implementation
+├── dayplanner-llm.ts         # LLM integration
+├── dayplanner-tests.ts       # Test cases and examples
+├── dist/                     # Compiled JavaScript output
+└── README.md                 # This file
 ```
+
+## Test Cases
+
+The application includes three comprehensive test cases:
+
+### 1. Manual Scheduling
+Demonstrates adding activities and manually assigning them to time slots:
+
+```typescript
+const planner = new DayPlanner();
+const breakfast = planner.addActivity('Breakfast', 1); // 30 minutes
+planner.assignActivity(breakfast, 14); // 7:00 AM
+```
+
+### 2. LLM-Assisted Scheduling
+Shows AI-powered scheduling with hardwired preferences:
+
+```typescript
+const planner = new DayPlanner();
+planner.addActivity('Morning Jog', 2);
+planner.addActivity('Math Homework', 4);
+await llm.requestAssignmentsFromLLM(planner);
+```
+
+### 3. Mixed Scheduling
+Combines manual assignments with AI assistance for remaining activities.
 
 ## Sample Output
 
-The application will generate a schedule like this:
-
 ```
-📅 DAILY SCHEDULE
+📅 Daily Schedule
 ==================
+7:00 AM - Breakfast (30 min)
+8:00 AM - Morning Workout (1 hours)
+10:00 AM - Study Session (1.5 hours)
+1:00 PM - Lunch (30 min)
+3:00 PM - Team Meeting (1 hours)
+7:00 PM - Dinner (30 min)
+9:00 PM - Evening Reading (1 hours)
 
-🌅 MORNING (6:00 AM - 12:00 PM)
---------------------------------
-⏰ 7:00 AM - morning run
-   Category: exercise | Duration: 30 minutes
-
-⏰ 8:00 AM - breakfast
-   Category: meal | Duration: 20 minutes
-
-⏰ 10:00 AM - grocery shopping
-   Category: errand | Duration: 45 minutes
-
-☀️  AFTERNOON (12:00 PM - 6:00 PM)
-----------------------------------
-⏰ 12:00 PM - lunch
-   Category: meal | Duration: 30 minutes
-
-⏰ 2:30 PM - CS 6104 lecture at 2:30pm
-   Category: class | Duration: 75 minutes
-
-⏰ 4:00 PM - study for math exam
-   Category: study | Duration: 2 hours
-
-🌙 EVENING (6:00 PM - 11:00 PM)
--------------------------------
-⏰ 6:00 PM - dinner with jane and joe
-   Category: social | Duration: 90 minutes
-
-⏰ 8:00 PM - group project meeting
-   Category: study | Duration: 90 minutes
+📋 Unassigned Activities
+========================
+All activities are assigned!
 ```
 
-## Customizing the Data
+## Key Features
 
-To use your own student data:
+- **Simple State Management**: Activities and assignments stored in memory
+- **Flexible Time System**: Half-hour slots from midnight (0-47)
+- **Query-Based Display**: Schedule generated on-demand, not stored sorted
+- **AI Integration**: Hardwired preferences in LLM prompt (no external hints)
+- **Conflict Detection**: Prevents overlapping activities
+- **Clean Architecture**: First principles implementation with no legacy code
 
-1. **Edit `student-data.json`**:
-   - Change the student name
-   - Update the preferences paragraph
-   - Modify the events list with your own tasks
+## LLM Preferences (Hardwired)
 
+The AI uses these built-in preferences:
+- Exercise activities: Morning (6:00 AM - 10:00 AM)
+- Study/Classes: Focused hours (9:00 AM - 5:00 PM)
+- Meals: Regular intervals (breakfast 7-9 AM, lunch 12-1 PM, dinner 6-8 PM)
+- Social/Relaxation: Evenings (6:00 PM - 10:00 PM)
+- Avoid: Demanding activities after 10:00 PM
 
 ## Troubleshooting
 
 ### "Could not load config.json"
-- Make sure you've created `config.json` with your API key
-- Check that the JSON format is correct (no extra commas, proper quotes)
+- Ensure `config.json` exists with your API key
+- Check JSON format is correct
 
 ### "Error calling Gemini API"
-- Verify your API key is correct
-- Check your internet connection
-- Make sure you have API access enabled in Google AI Studio
+- Verify API key is correct
+- Check internet connection
+- Ensure API access is enabled in Google AI Studio
 
-### "No JSON found in response"
-- This sometimes happens if Gemini returns extra text
-- The raw response will be displayed so you can see what went wrong
-
-### "loadApiKey is not a function" or similar module errors
-- This happens with ts-node in development mode due to module resolution issues
-- Use `npm start` (compiled version) instead of `npm run dev`
-- The compiled version works perfectly and is recommended
+### Build Issues
+- Use `npm run build` to compile TypeScript
+- Check that all dependencies are installed with `npm install`
 
 ## Next Steps
 
-Try modifying the code to:
-- Add more detailed time preferences
-- Include location information for events
-- Generate weekly schedules instead of daily
-- Add conflict detection for overlapping events
-- Create a web interface for easier interaction
+Try extending the DayPlanner:
+- Add weekly scheduling
+- Implement activity categories
+- Add location information
+- Create a web interface
+- Add conflict resolution strategies
+- Implement recurring activities
 
 ## Resources
 
 - [Google Generative AI Documentation](https://ai.google.dev/docs)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-
-## How this was built
-
-I built this demo using Cursor's agent mode. It required quite a bit of iteration, as well as many manual changes on my part.
