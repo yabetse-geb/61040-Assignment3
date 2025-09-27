@@ -1,5 +1,5 @@
 # DayPlanner 
-A clean, simple day planner built from first principles using TypeScript and Google's Gemini AI. This implementation focuses on the core concept of organizing activities for a single day with both manual and AI-assisted scheduling.
+A simple day planner. This implementation focuses on the core concept of organizing activities for a single day with both manual and AI-assisted scheduling.
 
 ## Concept: DayPlanner
 
