@@ -5,15 +5,14 @@
  */
 
 import { DayPlanner } from './dayplanner';
-import { DayPlannerLLM } from './dayplanner-llm';
-import { Config } from './dayplanner-types';
+import { GeminiLLM, Config } from './gemini-llm';
 
 /**
  * Load configuration from config.json
  */
 function loadConfig(): Config {
     try {
-        const config = require('./config.json');
+        const config = require('../config.json');
         return config;
     } catch (error) {
         console.error('❌ Error loading config.json. Please ensure it exists with your API key.');
@@ -66,7 +65,7 @@ export async function testLLMScheduling(): Promise<void> {
     
     const planner = new DayPlanner();
     const config = loadConfig();
-    const llm = new DayPlannerLLM(config);
+    const llm = new GeminiLLM(config);
     
     // Add some activities (similar to manual test but different)
     console.log('📝 Adding activities...');
@@ -84,7 +83,7 @@ export async function testLLMScheduling(): Promise<void> {
     planner.displaySchedule();
     
     // Let the LLM assign all activities
-    await llm.requestAssignmentsFromLLM(planner);
+    await planner.assignActivities(llm);
     
     // Display the final schedule
     console.log('\n📅 Final schedule after LLM assignment:');
@@ -101,7 +100,7 @@ export async function testMixedScheduling(): Promise<void> {
     
     const planner = new DayPlanner();
     const config = loadConfig();
-    const llm = new DayPlannerLLM(config);
+    const llm = new GeminiLLM(config);
     
     // Add activities
     console.log('📝 Adding activities...');
@@ -123,7 +122,7 @@ export async function testMixedScheduling(): Promise<void> {
     planner.displaySchedule();
     
     // Let LLM assign the remaining activities
-    await llm.requestAssignmentsFromLLM(planner);
+    await planner.assignActivities(llm);
     
     // Display final schedule
     console.log('\n📅 Final schedule after LLM assignment:');
