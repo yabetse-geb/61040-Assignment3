@@ -20,9 +20,8 @@
     "*.ts"
   ],
   "files": [
-    "dayplanner-types.ts",
     "dayplanner.ts",
-    "dayplanner-llm.ts",
+    "gemini-llm.ts",
     "dayplanner-tests.ts"
   ],
   "exclude": [

@@ -1,22 +1,29 @@
 /**
- * DayPlanner - Core Implementation
+ * DayPlanner - AI Augmented Version
  * 
  * A simple day planner that helps organize activities for a single day.
  * You can add activities one at a time, assign them to times, and observe the completed schedule.
  */
 
-import { Activity, Assignment } from './dayplanner-types';
+import { GeminiLLM } from './gemini-llm';
+
+// A single activity that can be scheduled
+export interface Activity {
+    title: string;
+    duration: number; // in half-hour increments
+    startTime?: number; // optional, in half-hour slots from midnight
+}
+
+// An assignment of an activity to a specific time slot
+ export interface Assignment {
+    activity: Activity;
+    startTime: number; // in half-hour slots from midnight
+}
 
 export class DayPlanner {
     private activities: Activity[] = [];
     private assignments: Assignment[] = [];
 
-    /**
-     * Add a new activity to the planner
-     * @param title - The title/description of the activity
-     * @param duration - Duration in half-hour increments
-     * @returns The created activity
-     */
     addActivity(title: string, duration: number): Activity {
         const activity: Activity = {
             title,
@@ -27,11 +34,6 @@ export class DayPlanner {
         return activity;
     }
 
-    /**
-     * Remove an activity from the planner
-     * Also removes any assignments for this activity
-     * @param activity - The activity to remove
-     */
     removeActivity(activity: Activity): void {
         // Remove assignments for this activity
         this.assignments = this.assignments.filter(assignment => assignment.activity !== activity);
@@ -40,11 +42,6 @@ export class DayPlanner {
         this.activities = this.activities.filter(a => a !== activity);
     }
 
-    /**
-     * Assign an activity to a specific start time
-     * @param activity - The activity to assign
-     * @param startTime - Start time in half-hour slots from midnight
-     */
     assignActivity(activity: Activity, startTime: number): void {
         // Remove any existing assignment for this activity
         this.unassignActivity(activity);
@@ -61,10 +58,6 @@ export class DayPlanner {
         activity.startTime = startTime;
     }
 
-    /**
-     * Remove assignment for an activity
-     * @param activity - The activity to unassign
-     */
     unassignActivity(activity: Activity): void {
         this.assignments = this.assignments.filter(assignment => assignment.activity !== activity);
         activity.startTime = undefined;
@@ -173,6 +166,126 @@ export class DayPlanner {
             });
         } else {
             console.log('All activities are assigned!');
+        }
+    }
+        /**
+     * Request assignments from LLM for all unassigned activities
+     * Uses hardwired preferences in the prompt
+     */
+    async requestAssignmentsFromLLM(llm: GeminiLLM): Promise<void> {
+        try {
+            console.log('🤖 Requesting schedule assignments from Gemini AI...');
+            
+            // Get unassigned activities
+            const unassignedActivities = this.getActivities().filter(a => !a.startTime);
+            
+            if (unassignedActivities.length === 0) {
+                console.log('✅ All activities are already assigned!');
+                return;
+            }
+
+            // Create the prompt with hardwired preferences
+            const prompt = this.createAssignmentPrompt(unassignedActivities);
+            const text = await llm.executeLLM(prompt);
+            
+            console.log('✅ Received response from Gemini AI!');
+            console.log('\n🤖 RAW GEMINI RESPONSE');
+            console.log('======================');
+            console.log(text);
+            console.log('======================\n');
+            
+            // Parse and apply the assignments
+            this.parseAndApplyAssignments(text, unassignedActivities);
+            
+        } catch (error) {
+            console.error('❌ Error calling Gemini API:', (error as Error).message);
+            throw error;
+        }
+    }
+
+    /**
+     * Create the prompt for Gemini with hardwired preferences
+     */
+    private createAssignmentPrompt(activities: Activity[]): string {
+        const activitiesList = activities.map(activity => {
+            const durationStr = activity.duration === 1 ? '30 minutes' : `${activity.duration * 0.5} hours`;
+            return `- ${activity.title} (${durationStr})`;
+        }).join('\n');
+
+        return `
+You are a helpful AI assistant that creates optimal daily schedules for students.
+
+STUDENT PREFERENCES:
+- Exercise activities work well in the morning (6:00 AM - 10:00 AM)
+- Classes and study time should be scheduled during focused hours (9:00 AM - 5:00 PM)
+- Meals should be at regular intervals (breakfast 7-9 AM, lunch 12-1 PM, dinner 6-8 PM)
+- Social activities and relaxation are good for evenings (6:00 PM - 10:00 PM)
+- Avoid scheduling demanding activities too late at night (after 10:00 PM)
+- Leave buffer time between different types of activities
+
+TIME SYSTEM:
+- Times are represented in half-hour slots starting at midnight
+- Slot 0 = 12:00 AM, Slot 13 = 6:30 AM, Slot 26 = 1:00 PM, Slot 38 = 7:00 PM, etc.
+- There are 48 slots total (24 hours x 2)
+- Valid slots are 0-47 (midnight to 11:30 PM)
+
+ACTIVITIES TO SCHEDULE (ONLY THESE - DO NOT ADD OTHERS):
+${activitiesList}
+
+CRITICAL REQUIREMENTS:
+1. ONLY assign the activities listed above - do NOT add any new activities
+2. Use ONLY valid time slots (0-47)
+3. Avoid conflicts - don't overlap activities
+4. Consider the duration of each activity when scheduling
+5. Use appropriate time slots based on the preferences above
+
+Return your response as a JSON object with this exact structure:
+{
+  "assignments": [
+    {
+      "title": "exact activity title from the list above",
+      "startTime": valid_slot_number_0_to_47
+    }
+  ]
+}
+
+Return ONLY the JSON object, no additional text.`;
+
+    }
+
+    /**
+     * Parse the LLM response and apply assignments to the day planner
+     */
+    private parseAndApplyAssignments(responseText: string, unassignedActivities: Activity[]): void {
+        try {
+            // Extract JSON from response (in case there's extra text)
+            const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) {
+                throw new Error('No JSON found in response');
+            }
+
+            const response = JSON.parse(jsonMatch[0]);
+            
+            if (!response.assignments || !Array.isArray(response.assignments)) {
+                throw new Error('Invalid response format');
+            }
+
+            console.log('📝 Applying LLM assignments...');
+            
+            for (const assignment of response.assignments) {
+                const activity = unassignedActivities.find(a => a.title === assignment.title);
+                if (activity && typeof assignment.startTime === 'number') {
+                    this.assignActivity(activity, assignment.startTime);
+                    console.log(`✅ Assigned "${activity.title}" to ${this.formatTimeSlot(assignment.startTime)}`);
+                } else {
+                    console.log(`⚠️  Could not find activity "${assignment.title}" or invalid start time`);
+                }
+            }
+            
+        } catch (error) {
+            console.error('❌ Error parsing LLM response:', (error as Error).message);
+            console.log('Response was:', responseText);
+            throw error;
         }
     }
 }
