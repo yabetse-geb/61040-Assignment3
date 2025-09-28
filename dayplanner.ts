@@ -155,15 +155,86 @@ Return ONLY the JSON object, no additional text.`;
             }
 
             console.log('📝 Applying LLM assignments...');
-            
-            for (const assignment of response.assignments) {
-                const activity = unassignedActivities.find(a => a.title === assignment.title);
-                if (activity && typeof assignment.startTime === 'number') {
-                    this.assignActivity(activity, assignment.startTime);
-                    console.log(`✅ Assigned "${activity.title}" to ${this.formatTimeSlot(assignment.startTime)}`);
-                } else {
-                    console.log(`⚠️  Could not find activity "${assignment.title}" or invalid start time`);
+
+            const activitiesByTitle = new Map<string, Activity[]>();
+            for (const activity of unassignedActivities) {
+                const list = activitiesByTitle.get(activity.title) ?? [];
+                list.push(activity);
+                activitiesByTitle.set(activity.title, list);
+            }
+
+            const issues: string[] = [];
+            const validatedAssignments: { activity: Activity; startTime: number }[] = [];
+            const occupiedSlots = new Map<number, Activity>();
+
+            for (const rawAssignment of response.assignments) {
+                if (typeof rawAssignment !== 'object' || rawAssignment === null) {
+                    issues.push('Encountered an assignment entry that is not an object.');
+                    continue;
                 }
+
+                const { title, startTime } = rawAssignment as { title?: unknown; startTime?: unknown };
+
+                if (typeof title !== 'string' || title.trim().length === 0) {
+                    issues.push('Assignment is missing a valid activity title.');
+                    continue;
+                }
+
+                const pool = activitiesByTitle.get(title);
+                if (!pool || pool.length === 0) {
+                    issues.push(`No available occurrences of activity "${title}" to assign.`);
+                    continue;
+                }
+
+                const activity = pool.shift() as Activity;
+
+                if (typeof startTime !== 'number' || !Number.isInteger(startTime)) {
+                    issues.push(`Activity "${title}" has a non-integer start time.`);
+                    continue;
+                }
+
+                if (startTime < 0 || startTime > 47) {
+                    issues.push(`Activity "${title}" has an out-of-range start time (${startTime}).`);
+                    continue;
+                }
+
+                const endSlot = startTime + activity.duration;
+                if (endSlot > 48) {
+                    issues.push(`Activity "${title}" would extend past the end of the day.`);
+                    continue;
+                }
+
+                let conflictDetected = false;
+                for (let offset = 0; offset < activity.duration; offset++) {
+                    const slot = startTime + offset;
+                    const occupyingActivity = occupiedSlots.get(slot);
+                    if (occupyingActivity) {
+                        issues.push(`Time slot ${this.formatTimeSlot(slot)} is already taken by "${occupyingActivity.title}" and conflicts with "${title}".`);
+                        conflictDetected = true;
+                        break;
+                    }
+                }
+
+                if (conflictDetected) {
+                    // Put the activity back so we can report subsequent issues accurately.
+                    pool.unshift(activity);
+                    continue;
+                }
+
+                for (let offset = 0; offset < activity.duration; offset++) {
+                    occupiedSlots.set(startTime + offset, activity);
+                }
+
+                validatedAssignments.push({ activity, startTime });
+            }
+
+            if (issues.length > 0) {
+                throw new Error(`LLM provided disallowed assignments:\n- ${issues.join('\n- ')}`);
+            }
+
+            for (const assignment of validatedAssignments) {
+                this.assignActivity(assignment.activity, assignment.startTime);
+                console.log(`✅ Assigned "${assignment.activity.title}" to ${this.formatTimeSlot(assignment.startTime)}`);
             }
             
         } catch (error) {
