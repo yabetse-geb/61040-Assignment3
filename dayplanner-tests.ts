@@ -13,7 +13,7 @@ import { Config } from './dayplanner-types';
  */
 function loadConfig(): Config {
     try {
-        const config = require('./config.json');
+        const config = require('../config.json');
         return config;
     } catch (error) {
         console.error('❌ Error loading config.json. Please ensure it exists with your API key.');
