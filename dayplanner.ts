@@ -121,6 +121,7 @@ CRITICAL REQUIREMENTS:
 3. Avoid conflicts - don't overlap activities
 4. Consider the duration of each activity when scheduling
 5. Use appropriate time slots based on the preferences above
+6. Never assign an activity to more than one time slot
 
 Return your response as a JSON object with this exact structure:
 {
