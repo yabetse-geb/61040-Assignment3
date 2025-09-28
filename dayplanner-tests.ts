@@ -83,7 +83,7 @@ export async function testLLMScheduling(): Promise<void> {
     planner.displaySchedule();
     
     // Let the LLM assign all activities
-    await planner.requestAssignmentsFromLLM(llm);
+    await planner.assignActivities(llm);
     
     // Display the final schedule
     console.log('\n📅 Final schedule after LLM assignment:');
@@ -122,7 +122,7 @@ export async function testMixedScheduling(): Promise<void> {
     planner.displaySchedule();
     
     // Let LLM assign the remaining activities
-    await planner.requestAssignmentsFromLLM(llm);
+    await planner.assignActivities(llm);
     
     // Display final schedule
     console.log('\n📅 Final schedule after LLM assignment:');
