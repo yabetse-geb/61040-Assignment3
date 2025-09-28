@@ -65,7 +65,9 @@ export class DayPlanner {
                 return;
             }
 
-            const prompt = this.createAssignmentPrompt(unassignedActivities);
+            const existingAssignments = this.assignments.slice();
+
+            const prompt = this.createAssignmentPrompt(unassignedActivities, existingAssignments);
             const text = await llm.executeLLM(prompt);
             
             console.log('✅ Received response from Gemini AI!');
@@ -94,7 +96,24 @@ export class DayPlanner {
     /**
      * Create the prompt for Gemini with hardwired preferences
      */
-    private createAssignmentPrompt(activities: Activity[]): string {
+    private createAssignmentPrompt(activities: Activity[], existingAssignments: Assignment[]): string {
+        const existingAssignmentsSection = existingAssignments.length > 0
+            ? `\nEXISTING ASSIGNMENTS (ALREADY SCHEDULED - DO NOT MODIFY):\n${this.assignmentsToString(existingAssignments)}\n`
+            : '';
+
+        const criticalRequirements = [
+            "1. ONLY assign the activities listed above - do NOT add any new activities",
+            "2. Use ONLY valid time slots (0-47)",
+            "3. Avoid conflicts - don't overlap activities",
+            "4. Consider the duration of each activity when scheduling",
+            "5. Use appropriate time slots based on the preferences above",
+            "6. Never assign an activity to more than one time slot"
+        ];
+
+        if (existingAssignments.length > 0) {
+            criticalRequirements.push(`${criticalRequirements.length + 1}. Keep the existing assignments listed above exactly as they are (no overlaps or changes)`);
+        }
+
         return `
 You are a helpful AI assistant that creates optimal daily schedules for students.
 
@@ -112,16 +131,11 @@ TIME SYSTEM:
 - There are 48 slots total (24 hours x 2)
 - Valid slots are 0-47 (midnight to 11:30 PM)
 
-ACTIVITIES TO SCHEDULE (ONLY THESE - DO NOT ADD OTHERS):
+${existingAssignmentsSection}ACTIVITIES TO SCHEDULE (ONLY THESE - DO NOT ADD OTHERS):
 ${this.activitiesToString(activities)}
 
 CRITICAL REQUIREMENTS:
-1. ONLY assign the activities listed above - do NOT add any new activities
-2. Use ONLY valid time slots (0-47)
-3. Avoid conflicts - don't overlap activities
-4. Consider the duration of each activity when scheduling
-5. Use appropriate time slots based on the preferences above
-6. Never assign an activity to more than one time slot
+${criticalRequirements.join('\n')}
 
 Return your response as a JSON object with this exact structure:
 {
@@ -166,6 +180,12 @@ Return ONLY the JSON object, no additional text.`;
             const issues: string[] = [];
             const validatedAssignments: { activity: Activity; startTime: number }[] = [];
             const occupiedSlots = new Map<number, Activity>();
+
+            for (const existingAssignment of this.assignments) {
+                for (let offset = 0; offset < existingAssignment.activity.duration; offset++) {
+                    occupiedSlots.set(existingAssignment.startTime + offset, existingAssignment.activity);
+                }
+            }
 
             for (const rawAssignment of response.assignments) {
                 if (typeof rawAssignment !== 'object' || rawAssignment === null) {
@@ -291,6 +311,16 @@ Return ONLY the JSON object, no additional text.`;
             const durationStr = activity.duration === 1 ? '30 minutes' : `${activity.duration * 0.5} hours`;
             return `- ${activity.title} (${durationStr})`;
         }).join('\n');
+    }
+
+    private assignmentsToString(assignments: Assignment[]): string {
+        return assignments
+            .map(assignment => {
+                const time = this.formatTimeSlot(assignment.startTime);
+                const durationStr = assignment.activity.duration === 1 ? '30 minutes' : `${assignment.activity.duration * 0.5} hours`;
+                return `- ${assignment.activity.title} at ${time} (${durationStr})`;
+            })
+            .join('\n');
     }
 
     /**
